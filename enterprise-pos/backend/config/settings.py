@@ -24,12 +24,16 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j2*b*2n5y6y-cc)mb(!u+$im#t^z!z2q3&!i(54wrwtex0qs9j'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-j2*b*2n5y6y-cc)mb(!u+$im#t^z!z2q3&!i(54wrwtex0qs9j')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False 
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS')
+if allowed_hosts_env:
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',') if host.strip()]
+else:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -66,12 +70,16 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:5174',
-    'http://localhost:5174',
-    'http://127.0.0.1:5173',
-    'http://localhost:5173',
-]
+cors_origins_env = os.getenv('CORS_ALLOWED_ORIGINS')
+if cors_origins_env:
+    CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_env.split(',') if origin.strip()]
+else:
+    CORS_ALLOWED_ORIGINS = [
+        'http://127.0.0.1:5174',
+        'http://localhost:5174',
+        'http://127.0.0.1:5173',
+        'http://localhost:5173',
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 
