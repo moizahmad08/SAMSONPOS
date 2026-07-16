@@ -81,6 +81,9 @@ else:
         'http://localhost:5173',
     ]
 
+# Allow all origins in production (Nginx reverse proxy handles security)
+CORS_ALLOW_ALL_ORIGINS = not DEBUG
+
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'config.urls'

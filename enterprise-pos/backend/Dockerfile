@@ -2,31 +2,28 @@
 FROM python:3.11-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies needed for compiling mysqlclient
+# psycopg2-binary is pre-compiled, no system build deps needed
+# Only install minimal curl for health checks
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libmariadb-dev \
-    pkg-config \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies
+# Install python dependencies first (better layer caching)
 COPY requirements.txt /app/
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copy project files
 COPY . /app/
 
-# Collect static files for Django Admin
-RUN python manage.py collectstatic --noinput
-
 # Expose backend API port
 EXPOSE 8000
 
-# Start WSGI server using Gunicorn
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+# On startup: collect static files, then run Gunicorn
+CMD python manage.py collectstatic --noinput && \
+    gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
