@@ -98,6 +98,7 @@ function App() {
     try {
       const payload = { 
         ...newProduct, 
+        cost_price: parseFloat(newProduct.selling_price) || 0.0,
         selling_price: parseFloat(newProduct.selling_price), 
         stock_quantity: parseInt(newProduct.stock_quantity), 
         reorder_level: parseInt(newProduct.reorder_level) 
