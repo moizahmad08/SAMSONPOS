@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  db:
-    image: mysql:8.0
-    container_name: sansons_db
-    restart: always
-    environment:
-      MYSQL_DATABASE: ${DB_NAME:-pos_db}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-Mady7077**}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
   backend:
     build:
       context: ./enterprise-pos/backend
@@ -22,15 +10,14 @@ services:
       - DEBUG=${DEBUG:-False}
       - SECRET_KEY=${SECRET_KEY:-django-insecure-j2*b*2n5y6y-cc)mb(!u+$im#t^z!z2q3&!i(54wrwtex0qs9j}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
-      - DB_NAME=${DB_NAME:-pos_db}
-      - DB_USER=${DB_USER:-root}
-      - DB_PASSWORD=${DB_PASSWORD:-Mady7077**}
-      - DB_HOST=db
-      - DB_PORT=3306
+      - DB_ENGINE=${DB_ENGINE:-django.db.backends.postgresql}
+      - DB_NAME=${DB_NAME:-postgres}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-your_supabase_password_here}
+      - DB_HOST=${DB_HOST:-db.gxpphoctlyuwoucoummy.supabase.co}
+      - DB_PORT=${DB_PORT:-5432}
     ports:
       - "8000:8000"
-    depends_on:
-      - db
 
   frontend:
     build:
@@ -41,6 +28,3 @@ services:
       - "80:80"
     depends_on:
       - backend
-
-volumes:
-  mysql_data:

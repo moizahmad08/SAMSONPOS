@@ -1,11 +1,11 @@
-# Deploying SanSons POS on a VPS
+# Deploying SanSons POS on a VPS (Supabase DB)
 
-This repository is optimized for deployment on a Virtual Private Server (VPS). You can deploy using either **Docker Compose (Recommended)** or a **Traditional Nginx + Gunicorn + Systemd** setup.
+This repository is optimized for deployment on a Virtual Private Server (VPS), connecting to a remote **Supabase PostgreSQL** database. You can deploy using either **Docker Compose (Recommended)** or a **Traditional Nginx + Gunicorn + Systemd** setup.
 
 ---
 
 ## Prerequisites (Common)
-Before deployment, configure your firewall (UFW or security groups) to allow the following ports:
+Configure your firewall (UFW or security groups) on the VPS to allow:
 *   `80` (HTTP)
 *   `443` (HTTPS)
 *   `22` (SSH)
@@ -14,7 +14,7 @@ Before deployment, configure your firewall (UFW or security groups) to allow the
 
 ## Option 1: Docker Compose Deployment (Recommended)
 
-Docker handles databases, dependencies, servers, and configurations automatically.
+Docker handles servers, dependencies, and routing configurations automatically.
 
 ### 1. Install Docker & Docker Compose
 Log in to your VPS and install Docker:
@@ -27,7 +27,7 @@ sudo apt install -y docker.io docker-compose-v2 git
 sudo systemctl enable --now docker
 ```
 
-### 2. Clone Repository & Setup Environments
+### 2. Clone Repository & Setup Environment
 ```bash
 git clone https://github.com/moizahmad08/SAMSONPOS.git
 cd SAMSONPOS
@@ -35,27 +35,32 @@ cd SAMSONPOS
 # Create a production .env file
 nano .env
 ```
-Inside your `.env` file, configure the production variables:
+Populate your `.env` file with your production environment variables, including your Supabase credentials:
 ```env
 DEBUG=False
 SECRET_KEY=generate-a-strong-random-key-here
 ALLOWED_HOSTS=your_vps_ip,your_domain.com
-DB_NAME=pos_db
-DB_USER=root
-DB_PASSWORD=your_strong_mysql_password
+
+# Supabase Credentials
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=your_supabase_password_here
+DB_HOST=db.gxpphoctlyuwoucoummy.supabase.co
+DB_PORT=5432
 ```
 
 ### 3. Spin up the containers
-Build and start all services in the background:
+Build and start the web servers in the background:
 ```bash
 sudo docker compose up -d --build
 ```
-This builds the React app, prepares Nginx to serve the site on port 80, starts MySQL, and runs Gunicorn for the Django backend.
+This compiles the React app, configures Nginx reverse proxies, starts the backend Gunicorn engine, and hooks into your Supabase database.
 
 ### 4. Run Migrations & Create Admin User
-Initialize the MySQL database and register your Admin superuser:
+Deploy the database schemas and configure your Admin user profile:
 ```bash
-# Run database schema migrations
+# Run database schema migrations on Supabase
 sudo docker compose exec backend python manage.py migrate
 
 # Create the admin login credentials
@@ -73,20 +78,11 @@ If you prefer to run services directly on the host machine.
 ### 1. Install System Dependencies
 ```bash
 sudo apt update
-sudo apt install -y python3-pip python3-venv nginx mysql-server libmysqlclient-dev nodejs npm git
+sudo apt install -y python3-pip python3-venv nginx libpq-dev nodejs npm git
 ```
+*Note: `libpq-dev` is required to build the PostgreSQL database adapter (`psycopg2`).*
 
-### 2. Configure MySQL Database
-Log into MySQL and set up the schema:
-```sql
-CREATE DATABASE pos_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'root'@'localhost' IDENTIFIED BY 'your_strong_mysql_password';
-GRANT ALL PRIVILEGES ON pos_db.* TO 'root'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-### 3. Setup Django Backend
+### 2. Setup Django Backend
 ```bash
 cd /var/www
 sudo git clone https://github.com/moizahmad08/SAMSONPOS.git
@@ -99,7 +95,7 @@ pip install -r requirements.txt
 
 # Configure production .env
 nano .env
-# Populate with: DB_NAME, DB_USER, DB_PASSWORD, SECRET_KEY, ALLOWED_HOSTS, etc.
+# Populate with: DB_ENGINE, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, SECRET_KEY, ALLOWED_HOSTS, etc.
 
 # Run migrations & collect static files
 python manage.py migrate
@@ -107,12 +103,12 @@ python manage.py collectstatic
 python manage.py createsuperuser
 ```
 
-### 4. Setup Gunicorn Systemd Service
-Create a Gunicorn systemd service:
+### 3. Setup Gunicorn Systemd Service
+Create the systemd daemon:
 ```bash
 sudo nano /etc/systemd/system/gunicorn.service
 ```
-Paste the configuration (modify paths as necessary):
+Paste the configuration:
 ```ini
 [Unit]
 Description=Gunicorn daemon for SanSons POS Backend
@@ -127,13 +123,13 @@ ExecStart=/var/www/SAMSONPOS/enterprise-pos/backend/venv/bin/gunicorn --workers 
 [Install]
 WantedBy=multi-user.target
 ```
-Enable and start Gunicorn:
+Enable and start the service:
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable --now gunicorn
 ```
 
-### 5. Build React Frontend
+### 4. Build React Frontend
 ```bash
 cd /var/www/SAMSONPOS/frontend
 
@@ -141,9 +137,8 @@ cd /var/www/SAMSONPOS/frontend
 npm install
 npm run build
 ```
-This generates the optimized production build directory inside `/var/www/SAMSONPOS/frontend/dist`.
 
-### 6. Setup Nginx Configuration
+### 5. Setup Nginx Configuration
 Create Nginx configuration:
 ```bash
 sudo nano /etc/nginx/sites-available/sansons-pos
