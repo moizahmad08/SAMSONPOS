@@ -1,0 +1,51 @@
+# Python ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.venv
+var/
+sdist/
+var/
+eggs/
+.eggs/
+parts/
+bin/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+parts/
+share/
+
+# Django ignores
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+
+# Node ignores
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Environment variables files
+.env
+.env.production
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE/OS ignores
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

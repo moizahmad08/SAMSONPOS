@@ -1,5 +1,7 @@
 Django>=6.0,<6.1
- djangorestframework
- django-cors-headers
- python-dotenv
- mysqlclient
+djangorestframework
+django-cors-headers
+python-dotenv
+mysqlclient
+gunicorn
+whitenoise
