@@ -8,7 +8,7 @@ services:
     restart: always
     environment:
       - DEBUG=${DEBUG:-False}
-      - SECRET_KEY=${SECRET_KEY:-django-insecure-j2*b*2n5y6y-cc)mb(!u+$im#t^z!z2q3&!i(54wrwtex0qs9j}
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-production-default-key-please-change-in-env}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
       - DB_ENGINE=${DB_ENGINE:-django.db.backends.postgresql}
       - DB_NAME=${DB_NAME:-postgres}
