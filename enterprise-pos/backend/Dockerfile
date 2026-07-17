@@ -8,9 +8,10 @@ ENV PYTHONUNBUFFERED=1
 # Set work directory
 WORKDIR /app
 
-# psycopg2-binary is pre-compiled, no system build deps needed
-# Only install minimal curl for health checks
+# Install system dependencies required by psycopg2-binary and pip
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    gcc \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -25,5 +26,4 @@ COPY . /app/
 EXPOSE 8000
 
 # On startup: collect static files, then run Gunicorn
-CMD python manage.py collectstatic --noinput && \
-    gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+CMD sh -c "python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
