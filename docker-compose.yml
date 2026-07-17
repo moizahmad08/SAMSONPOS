@@ -1,7 +1,6 @@
 services:
   backend:
-    build:
-      context: ./enterprise-pos/backend
+    image: ghcr.io/moizahmad08/samsonpos-backend:latest
     container_name: sansons_backend
     restart: always
     environment:
@@ -18,8 +17,7 @@ services:
       - "8000:8000"
 
   frontend:
-    build:
-      context: ./frontend
+    image: ghcr.io/moizahmad08/samsonpos-frontend:latest
     container_name: sansons_frontend
     restart: always
     ports:
