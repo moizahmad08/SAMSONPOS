@@ -25,5 +25,5 @@ COPY . /app/
 # Expose backend API port
 EXPOSE 8000
 
-# On startup: run migrations, collect static files, auto-create admin, then run Gunicorn
-CMD sh -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && python create_admin.py && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+# On startup: run migrations with fake-initial to support manual DDL, collect static files, auto-create admin, then run Gunicorn
+CMD sh -c "python manage.py migrate --fake-initial --noinput && python manage.py collectstatic --noinput && python create_admin.py && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
