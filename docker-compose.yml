@@ -12,7 +12,7 @@ services:
       - DB_USER=${DB_USER:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-your_supabase_password_here}
       - DB_HOST=host.docker.internal
-      - DB_PORT=5432
+      - DB_PORT=5435
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
