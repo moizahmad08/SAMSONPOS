@@ -1,7 +1,7 @@
 services:
-  backend:
-    image: ghcr.io/moizahmad08/samsonpos-backend:latest
-    container_name: sansons_backend
+  pos:
+    image: ghcr.io/moizahmad08/samsonpos:latest
+    container_name: sansons_pos
     restart: always
     environment:
       - DB_NAME=${DB_NAME:-postgres}
@@ -10,13 +10,4 @@ services:
       - DB_HOST=${DB_HOST:-aws-1-ap-northeast-1.pooler.supabase.com}
       - DB_PORT=${DB_PORT:-6543}
     ports:
-      - "6000:8000"
-
-  frontend:
-    image: ghcr.io/moizahmad08/samsonpos-frontend:latest
-    container_name: sansons_frontend
-    restart: always
-    ports:
-      - "4000:80"
-    depends_on:
-      - backend
+      - "4000:8000"

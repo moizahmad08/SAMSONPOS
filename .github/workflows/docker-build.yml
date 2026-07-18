@@ -1,4 +1,4 @@
-name: Build and Push Docker Images
+name: Build and Push Docker Image
 
 on:
   push:
@@ -26,16 +26,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Backend image
+      - name: Build and push unified app image
         uses: docker/build-push-action@v5
         with:
-          context: ./enterprise-pos/backend
+          context: .
           push: true
-          tags: ghcr.io/${{ env.OWNER }}/samsonpos-backend:latest
-
-      - name: Build and push Frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          push: true
-          tags: ghcr.io/${{ env.OWNER }}/samsonpos-frontend:latest
+          tags: ghcr.io/${{ env.OWNER }}/samsonpos:latest
